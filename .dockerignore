@@ -1,0 +1,13 @@
+cat > .dockerignore <<EOF
+# Ignore Node.js debugging files
+node_modules/
+npm-debug.log
+
+# Ignore local .env files
+.env
+
+# Ignore system-specific files
+.dockerignore
+.git
+.gitignore
+EOF
