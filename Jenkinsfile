@@ -2,6 +2,7 @@ pipeline {
     agent any
     
     environment {
+        PATH = "/usr/local/bin:$PATH"
         DOCKER_DEV_REPO = 'development'  // Replace with your development Docker Hub repository name
         DOCKER_PROD_REPO = 'prod'  // Replace with your production Docker Hub repository name
         DOCKER_HUB_CREDENTIALS = credentials('ezhilarasan1331-dockerhup')  // Jenkins credential ID for Docker Hub
@@ -42,7 +43,7 @@ pipeline {
                     // Run Docker Compose
                     echo "Starting Docker Compose..."
                     sh """
-                        /usr/local/bin/docker-compose up -d
+                        docker-compose up -d
                     """
                     
                     // Check if Docker Compose was successful
