@@ -1,6 +1,10 @@
 pipeline {
-    agent any 
-    
+    agent {
+        docker {
+            image 'docker:latest'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
     environment {
         DOCKER_DEV_REPO = 'development'  // Replace with your development Docker Hub repository name
         DOCKER_PROD_REPO = 'prod'  // Replace with your production Docker Hub repository name
