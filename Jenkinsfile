@@ -55,17 +55,21 @@ pipeline {
             }
         }
         
-           stage('Deploy') {
+                   stage('Deploy') {
             steps {
                 script {
                     def DOCKER_HUB_REPO
                     def branchName = env.GIT_BRANCH ?: env.BRANCH_NAME ?: 'unknown'
-
-                     // Remove 'origin/' prefix if present
+                    
+                    echo "Detected branch: ${branchName}"
+                    
+                    // Remove 'origin/' prefix if present
                     if (branchName.startsWith('origin/')) {
                         branchName = branchName.replace('origin/', '')
                     }
- 
+
+                    echo "Branch after removing prefix: ${branchName}"
+
                     // Determine the Docker Hub repo based on the branch
                     if (branchName == 'dev') {
                         DOCKER_HUB_REPO = DOCKER_DEV_REPO
@@ -75,19 +79,28 @@ pipeline {
                         error "Branch ${branchName} is not supported for deployment."
                     }
                     
+                    echo "Using Docker Hub repository: ${DOCKER_HUB_REPO}"
+                    
                     // Tag and push the Docker image to Docker Hub
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
                         def dockerLogin = "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}"
                         def dockerTag = "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
                         def dockerPush = "docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
                         
-                        // Execute docker login, tag, and push commands
-                        sh "${dockerLogin} && ${dockerTag} && ${dockerPush}"
+                        echo "Executing Docker login..."
+                        sh "${dockerLogin}"
+                        
+                        echo "Tagging Docker image..."
+                        sh "${dockerTag}"
+                        
+                        echo "Pushing Docker image to ${DOCKER_HUB_REPO}..."
+                        sh "${dockerPush}"
                     }
                 }
             }
         }
     }
+    
     
     post {
         always {
