@@ -5,7 +5,7 @@ pipeline {
     environment {
         DOCKER_DEV_REPO = 'development'  // Replace with your development Docker Hub repository name
         DOCKER_PROD_REPO = 'prod'  // Replace with your production Docker Hub repository name
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-user')  // Jenkins credential ID for Docker Hub
+        DOCKER_HUB_CREDENTIALS = credentials('ezhilarasan1331-dockerhup')  // Jenkins credential ID for Docker Hub
     }
     
     stages {
@@ -29,10 +29,10 @@ pipeline {
                     def dockerRepo
                     
                     if (env.BRANCH_NAME == 'dev') {
-                        dockerImage = docker.build("${DOCKER_DEV_REPO}/your-image-name")
+                        dockerImage = docker.build("${DOCKER_DEV_REPO}/capstoneimg")
                         dockerRepo = "${DOCKER_DEV_REPO}"
                     } else if (env.BRANCH_NAME == 'master') {
-                        dockerImage = docker.build("${DOCKER_PROD_REPO}/your-image-name")
+                        dockerImage = docker.build("${DOCKER_PROD_REPO}/capstoneimg")
                         dockerRepo = "${DOCKER_PROD_REPO}"
                     } else {
                         error "Branch not supported for Docker build"
