@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_DEV_REPO = 'development'  // Replace with your development Docker Hub repository name
         DOCKER_PROD_REPO = 'prod'  // Replace with your production Docker Hub repository name
-        DOCKER_HUB_CREDENTIALS = 'ezhilarasan1331-dockerhup'  // Jenkins credential ID for Docker Hub
+        DOCKER_HUB_CREDENTIALS = 'docker-hub-user'  // Jenkins credential ID for Docker Hub
         COMPOSE_FILE = "docker-compose.yml"
         IMAGE_NAME = "capstoneimg"
         IMAGE_TAG = "latest"
