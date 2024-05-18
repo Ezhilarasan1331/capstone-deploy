@@ -57,20 +57,49 @@ pipeline {
             }
         }
         
-        stage(' Docker Compose') {
+        stage('Deploy') {
+            when {
+                branch 'dev'
+            }
             steps {
                 script {
-                    // Run Docker Compose
-                    echo "Starting Docker Compose..."
-                    sh "docker-compose -f ${COMPOSE_FILE} down --remove-orphans"
-                    sh "docker-compose -f ${COMPOSE_FILE} up -d"
+                    def IMAGE_NAME = "capstoneimg"
+                    def IMAGE_TAG = "latest"
+                    def DOCKER_HUB_REPO = "${DOCKER_DEV_REPO}"
                     
-                    // Check if Docker Compose was successful
-                    def composeStatus = sh(script: "docker-compose -f ${COMPOSE_FILE} ps", returnStatus: true)
-                    if (composeStatus == 0) {
-                        echo "Docker Compose started successfully."
-                    } else {
-                        error "Failed to start Docker Compose."
+                    // Tag the Docker image
+                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    
+                    // Push the Docker image to Docker Hub
+                    withCredentials([usernamePassword(credentialsId: 'ezhilarasan1331-dockerhup', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                        sh "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}"
+                        sh "docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            when {
+                branch 'master'
+                // Only proceed if the previous stage was successful
+                expression {
+                    currentBuild.result == 'SUCCESS'
+                }
+            }
+            steps {
+                script {
+                    def IMAGE_NAME = "capstoneimg"
+                    def IMAGE_TAG = "latest"
+                    def DOCKER_HUB_REPO = "${DOCKER_PROD_REPO}"
+                    
+                    // Tag the Docker image
+                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    
+                    // Push the Docker image to Docker Hub
+                    withCredentials([usernamePassword(credentialsId: 'ezhilarasan1331-dockerhup', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                        sh "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}"
+                        sh "docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
                     }
                 }
             }
