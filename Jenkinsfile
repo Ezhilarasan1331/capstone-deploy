@@ -59,7 +59,7 @@ pipeline {
             steps {
                 script {
                     def DOCKER_HUB_REPO
-                    def branchName = env.BRANCH_NAME ?: 'unknown'
+                    def branchName = env.GIT_BRANCH ?: env.BRANCH_NAME ?: 'unknown'
                     
                     // Determine the Docker Hub repo based on the branch
                     if (branchName == 'dev') {
