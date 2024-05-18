@@ -57,7 +57,7 @@ pipeline {
             }
         }
         
-        stage('Deploy with Docker Compose') {
+        stage(' Docker Compose') {
             steps {
                 script {
                     // Run Docker Compose
