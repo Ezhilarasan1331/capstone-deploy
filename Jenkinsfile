@@ -15,24 +15,14 @@ pipeline {
             }
         }
         
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
                 script {
-                    def dockerImage
-                    def dockerRepo
-
-                    if (env.BRANCH_NAME == 'dev') {
-                        dockerRepo = "development"
-                    } else (env.BRANCH_NAME == 'master') {
-                        dockerRepo = "prod"
-                    } 
-                    dockerImage = docker.build("${dockerRepo}/capstone")
-
-                    // Push the Docker image
-                    docker.withRegistry('https://registry.hub.docker.com', 'ezhilarasan1331-dockerhup') {
-                        dockerImage.push()
-                        dockerImage.push('latest')
-                    }
+                    // Make the build.sh file executable
+                    sh 'chmod +x build.sh'
+                    
+                    // Execute the build.sh script
+                    sh './build.sh'
                 }
             }
         }

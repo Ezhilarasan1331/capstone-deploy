@@ -2,6 +2,7 @@
 
 # Define variables
 IMAGE_NAME="capstoneimg"
+IMAGE_TAG="latest"
 DOCKERFILE_PATH="." # Path to your Dockerfile, usually the current directory
 
 # Print a message
@@ -20,7 +21,7 @@ fi
 
 # Run Docker Compose
 echo "Starting Docker Compose..."
-docker-compose up -d
+/usr/local/bin/docker-compose up -d
 
 # Check if Docker Compose was successful
 if [ $? -eq 0 ]; then
