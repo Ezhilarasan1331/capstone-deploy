@@ -5,8 +5,7 @@ pipeline {
     environment {
         DOCKER_DEV_REPO = 'development'  // Replace with your development Docker Hub repository name
         DOCKER_PROD_REPO = 'prod'  // Replace with your production Docker Hub repository name
-        DOCKER_HUB_USER = credentials('docker-hub-user')  // Jenkins credentials for Docker Hub username
-        DOCKER_HUB_PASS = credentials('docker-hub-user')  // Jenkins credentials for Docker Hub password
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-user')  // Jenkins credential ID for Docker Hub
     }
     
     stages {
