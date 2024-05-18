@@ -5,6 +5,7 @@ pipeline {
         DOCKER_DEV_REPO = 'development'  // Replace with your development Docker Hub repository name
         DOCKER_PROD_REPO = 'prod'  // Replace with your production Docker Hub repository name
         DOCKER_HUB_CREDENTIALS = credentials('ezhilarasan1331-dockerhup')  // Jenkins credential ID for Docker Hub
+        COMPOSE_FILE = "docker-compose.yml"
     }
     
     stages {
@@ -59,9 +60,18 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    // Assuming docker-compose.yml is in the root directory of the repo
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d'
+                    // Run Docker Compose
+                    echo "Starting Docker Compose..."
+                    sh "docker-compose -f ${COMPOSE_FILE} down --remove-orphans"
+                    sh "docker-compose -f ${COMPOSE_FILE} up -d"
+                    
+                    // Check if Docker Compose was successful
+                    def composeStatus = sh(script: "docker-compose -f ${COMPOSE_FILE} ps", returnStatus: true)
+                    if (composeStatus == 0) {
+                        echo "Docker Compose started successfully."
+                    } else {
+                        error "Failed to start Docker Compose."
+                    }
                 }
             }
         }
