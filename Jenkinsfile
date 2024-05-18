@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:latest' // Use a Docker image that has Docker installed
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
+        }
+    }
     
     environment {
         DOCKER_DEV_REPO = 'development'  // Replace with your development Docker Hub repository name
@@ -46,3 +51,4 @@ pipeline {
         }
     }
 }
+
