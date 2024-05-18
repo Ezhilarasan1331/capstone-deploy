@@ -60,7 +60,12 @@ pipeline {
                 script {
                     def DOCKER_HUB_REPO
                     def branchName = env.GIT_BRANCH ?: env.BRANCH_NAME ?: 'unknown'
-                    
+
+                     // Remove 'origin/' prefix if present
+                    if (branchName.startsWith('origin/')) {
+                        branchName = branchName.replace('origin/', '')
+                    }
+ 
                     // Determine the Docker Hub repo based on the branch
                     if (branchName == 'dev') {
                         DOCKER_HUB_REPO = DOCKER_DEV_REPO
