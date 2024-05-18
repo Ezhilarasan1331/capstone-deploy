@@ -62,9 +62,6 @@ pipeline {
                     def IMAGE_NAME = "capstoneimg"
                     def IMAGE_TAG = "latest"
                     
-                    // Determine the branch name
-                    def branchName = env.BRANCH_NAME ?: 'master' // Use 'master' as default branch for testing
-                    
                     // Determine the Docker Hub repo based on the branch
                     if (branchName == 'dev') {
                         DOCKER_HUB_REPO = "${DOCKER_DEV_REPO}"
