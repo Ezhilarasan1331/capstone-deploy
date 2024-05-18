@@ -55,7 +55,7 @@ pipeline {
             }
         }
         
-       stage('Deploy') {
+        stage('Deploy') {
             steps {
                 script {
                     def DOCKER_HUB_REPO
