@@ -88,7 +88,10 @@ pipeline {
                         def dockerPush = "docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
                         
                         echo "Executing Docker login..."
-                        sh "${dockerLogin}"
+                        def loginResult = sh(script: "${dockerLogin}", returnStatus: true)
+                        if (loginResult != 0) {
+                            error "Docker login failed. Please check your credentials and try again."
+                        }
                         
                         echo "Tagging Docker image..."
                         sh "${dockerTag}"
