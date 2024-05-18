@@ -63,8 +63,8 @@ pipeline {
                     
                     echo "Detected branch: ${branchName}"
                     
-                    // Remove 'refs/heads/' prefix if present
-                    branchName = branchName.replaceAll('refs/heads/', '')
+                    // Remove 'origin/' prefix if present
+                    branchName = branchName.replaceAll('origin/', '')
                     
                     echo "Branch after removing prefix: ${branchName}"
                     
