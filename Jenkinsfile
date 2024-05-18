@@ -40,12 +40,12 @@ pipeline {
                     }
                     
                     // Push the Docker image
-                    docker.withRegistry("https://registry.hub.docker.com", "${DOCKER_HUB_USER}:${DOCKER_HUB_PASS}") {
+                    docker.withRegistry("registry.hub.docker.com", "${DOCKER_HUB_USER}:${DOCKER_HUB_PASS}") {
                         dockerImage.push()
                     }
                     
                     // Tag and push latest
-                    docker.withRegistry("https://registry.hub.docker.com", "${DOCKER_HUB_USER}:${DOCKER_HUB_PASS}") {
+                    docker.withRegistry("registry.hub.docker.com", "${DOCKER_HUB_USER}:${DOCKER_HUB_PASS}") {
                         dockerImage.push("${dockerRepo}/your-image-name:latest")
                     }
                 }
