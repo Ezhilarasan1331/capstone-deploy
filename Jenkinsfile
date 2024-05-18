@@ -72,7 +72,7 @@ pipeline {
                     }
                     
                     // Tag and push the Docker image to Docker Hub
-                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${DOCKER_HUB_CREDENTIALS}", usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${ezhilarasan1331-dockerhup}", usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
                         sh """
                             docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
                             docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
