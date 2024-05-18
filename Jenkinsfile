@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
     
@@ -16,39 +15,44 @@ pipeline {
             }
         }
         
-        stage('Build and Push Docker Image') {
-            when {
-                anyOf {
-                    branch 'dev'
-                    branch 'master'
-                }
-            }
+        stage('Build Docker Image') {
             steps {
                 script {
                     def dockerImage
                     def dockerRepo
-                    
+
                     if (env.BRANCH_NAME == 'dev') {
-                        dockerImage = docker.build("${DOCKER_DEV_REPO}/capstoneimg")
-                        dockerRepo = "${DOCKER_DEV_REPO}"
-                    } else if (env.BRANCH_NAME == 'master') {
-                        dockerImage = docker.build("${DOCKER_PROD_REPO}/capstoneimg")
-                        dockerRepo = "${DOCKER_PROD_REPO}"
-                    } else {
-                        error "Branch not supported for Docker build"
-                    }
-                    
+                        dockerRepo = "development"
+                    } else (env.BRANCH_NAME == 'master') {
+                        dockerRepo = "prod"
+                    } 
+                    dockerImage = docker.build("${dockerRepo}/capstone")
+
                     // Push the Docker image
-                    docker.withRegistry("registry.hub.docker.com", "${DOCKER_HUB_USER}:${DOCKER_HUB_PASS}") {
+                    docker.withRegistry('https://registry.hub.docker.com', 'ezhilarasan1331-dockerhup') {
                         dockerImage.push()
-                    }
-                    
-                    // Tag and push latest
-                    docker.withRegistry("registry.hub.docker.com", "${DOCKER_HUB_USER}:${DOCKER_HUB_PASS}") {
-                        dockerImage.push("${dockerRepo}/your-image-name:latest")
+                        dockerImage.push('latest')
                     }
                 }
             }
+        }
+        
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    // Assuming docker-compose.yml is in the root directory of the repo
+                    sh 'docker-compose down'
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Clean up Docker images after build
+            cleanWs()
+            // Optionally, you can perform additional cleanup or notifications here
         }
     }
 }
