@@ -8,14 +8,6 @@ DOCKERFILE_PATH="." # Path to your Dockerfile, usually the current directory
 # Print a message
 echo "Building Docker image ${IMAGE_NAME}:${IMAGE_TAG}..."
 
-# Install Docker Compose if not already installed
-if ! command -v docker-compose &> /dev/null
-then
-    echo "Docker Compose not found, installing..."
-    curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o docker-compose
-    chmod +x docker-compose
-fi
-
 # Build the Docker image
 docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERFILE_PATH}
 
@@ -29,7 +21,7 @@ fi
 
 # Run Docker Compose
 echo "Starting Docker Compose..."
-docker-compose up -d
+/usr/local/bin/docker-compose up -d
 
 # Check if Docker Compose was successful
 if [ $? -eq 0 ]; then
