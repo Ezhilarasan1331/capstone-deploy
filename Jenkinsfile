@@ -55,24 +55,27 @@ pipeline {
             }
         }
         
-        stage('Deploy') {
+       stage('Deploy') {
             steps {
                 script {
                     def DOCKER_HUB_REPO
                     def IMAGE_NAME = "capstoneimg"
                     def IMAGE_TAG = "latest"
                     
+                    // Determine the branch name
+                    def branchName = env.BRANCH_NAME ?: 'master' // Use 'master' as default branch for testing
+                    
                     // Determine the Docker Hub repo based on the branch
-                    if (env.BRANCH_NAME == 'dev') {
+                    if (branchName == 'dev') {
                         DOCKER_HUB_REPO = "${DOCKER_DEV_REPO}"
-                    } else if (env.BRANCH_NAME == 'master') {
+                    } else if (branchName == 'master') {
                         DOCKER_HUB_REPO = "${DOCKER_PROD_REPO}"
                     } else {
-                        error "Branch ${env.BRANCH_NAME} is not supported for deployment."
+                        error "Branch ${branchName} is not supported for deployment."
                     }
                     
                     // Tag and push the Docker image to Docker Hub
-                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${ezhilarasan1331-dockerhup}", usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "${DOCKER_HUB_CREDENTIALS}", usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
                         sh """
                             docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
                             docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
