@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_DEV_REPO = 'development'  // Replace with your development Docker Hub repository name
         DOCKER_PROD_REPO = 'prod'  // Replace with your production Docker Hub repository name
-        DOCKER_HUB_CREDENTIALS = credentials('ezhilarasan1331-dockerhup')  // Jenkins credential ID for Docker Hub
+        DOCKER_HUB_CREDENTIALS = 'ezhilarasan1331-dockerhup'  // Jenkins credential ID for Docker Hub
         COMPOSE_FILE = "docker-compose.yml"
         IMAGE_NAME = "capstoneimg"
         IMAGE_TAG = "latest"
@@ -64,10 +64,12 @@ pipeline {
                     echo "Detected branch: ${branchName}"
                     
                     // Remove 'origin/' prefix if present
-                    branchName = branchName.replaceAll('origin/', '')
-                    
+                    if (branchName.startsWith('origin/')) {
+                        branchName = branchName.replace('origin/', '')
+                    }
+
                     echo "Branch after removing prefix: ${branchName}"
-                    
+
                     // Determine the Docker Hub repo based on the branch
                     if (branchName == 'dev') {
                         DOCKER_HUB_REPO = DOCKER_DEV_REPO
@@ -79,17 +81,30 @@ pipeline {
                     
                     echo "Using Docker Hub repository: ${DOCKER_HUB_REPO}"
                     
-                    // Tag the Docker image
-                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
-                    
-                    // Docker login and push
-                    withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_CREDENTIALS', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                        echo "Logging in to Docker Hub..."
-                        sh "echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USER} --password-stdin"
+                    // Tag and push the Docker image to Docker Hub
+                    withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                        def dockerLogin = "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}"
+                        def dockerTag = "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+                        def dockerPush = "docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
                         
-                        // Push the Docker image
+                        echo "Executing Docker login..."
+                        def loginStatus = sh(script: dockerLogin, returnStatus: true)
+                        if (loginStatus != 0) {
+                            error "Docker login failed."
+                        } else {
+                            echo "Docker login successful."
+                        }
+                        
+                        echo "Tagging Docker image..."
+                        sh "${dockerTag}"
+                        
                         echo "Pushing Docker image to ${DOCKER_HUB_REPO}..."
-                        sh "docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+                        def pushStatus = sh(script: dockerPush, returnStatus: true)
+                        if (pushStatus != 0) {
+                            error "Docker push failed."
+                        } else {
+                            echo "Docker push successful."
+                        }
                     }
                 }
             }
