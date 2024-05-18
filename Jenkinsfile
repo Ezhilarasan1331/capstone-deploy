@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_DEV_REPO = 'development'  // Replace with your development Docker Hub repository name
         DOCKER_PROD_REPO = 'prod'  // Replace with your production Docker Hub repository name
-        DOCKER_HUB_CREDENTIALS = credentials('ezhilarasan1331-dockerhup')  // Jenkins credential ID for Docker Hub
+        DOCKER_HUB_CREDENTIALS = 'ezhilarasan1331-dockerhup'  // Jenkins credential ID for Docker Hub
         COMPOSE_FILE = "docker-compose.yml"
         IMAGE_NAME = "capstoneimg"
         IMAGE_TAG = "latest"
@@ -55,7 +55,7 @@ pipeline {
             }
         }
         
-                   stage('Deploy') {
+        stage('Deploy') {
             steps {
                 script {
                     def DOCKER_HUB_REPO
@@ -82,7 +82,7 @@ pipeline {
                     echo "Using Docker Hub repository: ${DOCKER_HUB_REPO}"
                     
                     // Tag and push the Docker image to Docker Hub
-                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: ezhilarasan1331-dockerhup, usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
+                    withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
                         def dockerLogin = "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}"
                         def dockerTag = "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
                         def dockerPush = "docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
@@ -100,7 +100,6 @@ pipeline {
             }
         }
     }
-    
     
     post {
         always {
