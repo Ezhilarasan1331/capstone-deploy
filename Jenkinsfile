@@ -63,12 +63,12 @@ pipeline {
                     def IMAGE_TAG = "latest"
                     
                     // Determine the Docker Hub repo based on the branch
-                    if (branchName == 'dev') {
+                    if (env.BRANCH_NAME == 'dev') {
                         DOCKER_HUB_REPO = "${DOCKER_DEV_REPO}"
-                    } else if (branchName == 'master') {
+                    } else if (env.BRANCH_NAME == 'master') {
                         DOCKER_HUB_REPO = "${DOCKER_PROD_REPO}"
                     } else {
-                        error "Branch ${branchName} is not supported for deployment."
+                        error "Branch ${env.BRANCH_NAME} is not supported for deployment."
                     }
                     
                     // Tag and push the Docker image to Docker Hub
