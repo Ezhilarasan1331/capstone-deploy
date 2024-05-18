@@ -7,7 +7,7 @@ pipeline {
         DOCKER_HUB_CREDENTIALS = credentials('ezhilarasan1331-dockerhup')  // Jenkins credential ID for Docker Hub
         COMPOSE_FILE = "docker-compose.yml"
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
