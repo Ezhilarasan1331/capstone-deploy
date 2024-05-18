@@ -6,6 +6,9 @@ pipeline {
         DOCKER_PROD_REPO = 'prod'  // Replace with your production Docker Hub repository name
         DOCKER_HUB_CREDENTIALS = credentials('ezhilarasan1331-dockerhup')  // Jenkins credential ID for Docker Hub
         COMPOSE_FILE = "docker-compose.yml"
+        IMAGE_NAME = "capstoneimg"
+        IMAGE_TAG = "latest"
+        DOCKERFILE_PATH = "." // Path to your Dockerfile, usually the current directory
     }
 
     stages {
@@ -16,14 +19,9 @@ pipeline {
             }
         }
         
-        stage('Build') {
+        stage('Build and Docker Compose') {
             steps {
                 script {
-                    // Define variables
-                    def IMAGE_NAME = "capstoneimg"
-                    def IMAGE_TAG = "latest"
-                    def DOCKERFILE_PATH = "." // Path to your Dockerfile, usually the current directory
-                    
                     // Print a message
                     echo "Building Docker image ${IMAGE_NAME}:${IMAGE_TAG}..."
                     
@@ -58,49 +56,27 @@ pipeline {
         }
         
         stage('Deploy') {
-            when {
-                branch 'dev'
-            }
             steps {
                 script {
+                    def DOCKER_HUB_REPO
                     def IMAGE_NAME = "capstoneimg"
                     def IMAGE_TAG = "latest"
-                    def DOCKER_HUB_REPO = "${DOCKER_DEV_REPO}"
                     
-                    // Tag the Docker image
-                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
-                    
-                    // Push the Docker image to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'ezhilarasan1331-dockerhup', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                        sh "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}"
-                        sh "docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    // Determine the Docker Hub repo based on the branch
+                    if (env.BRANCH_NAME == 'dev') {
+                        DOCKER_HUB_REPO = "${DOCKER_DEV_REPO}"
+                    } else if (env.BRANCH_NAME == 'master') {
+                        DOCKER_HUB_REPO = "${DOCKER_PROD_REPO}"
+                    } else {
+                        error "Branch ${env.BRANCH_NAME} is not supported for deployment."
                     }
-                }
-            }
-        }
-        
-        stage('Deploy') {
-            when {
-                branch 'master'
-                // Only proceed if the previous stage was successful
-                expression {
-                    currentBuild.result == 'SUCCESS'
-                }
-            }
-            steps {
-                script {
-                    def IMAGE_NAME = "capstoneimg"
-                    def IMAGE_TAG = "latest"
-                    def DOCKER_HUB_REPO = "${DOCKER_PROD_REPO}"
                     
-                    // Tag the Docker image
-                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
-                    
-                    // Push the Docker image to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'ezhilarasan1331-dockerhup', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                        sh "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}"
-                        sh "docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
-                    }
+                    // Tag and push the Docker image to Docker Hub
+                    sh """
+                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
+                        docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
+                        docker push ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
+                    """
                 }
             }
         }
@@ -110,7 +86,6 @@ pipeline {
         always {
             // Clean up Docker images after build
             cleanWs()
-            // Optionally, you can perform additional cleanup or notifications here
         }
     }
 }
