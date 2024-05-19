@@ -8,7 +8,7 @@ IMAGE_TAG="latest"
 DOCKERFILE_PATH="." # Path to your Dockerfile, usually the current directory
 COMPOSE_FILE="docker-compose.yml"
 
-# Print a message
+# Print a meg
 echo "Building Docker image ${IMAGE_NAME}:${IMAGE_TAG}..."
 
 # Build the Docker image
