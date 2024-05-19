@@ -55,9 +55,10 @@ pipeline {
             }
         }
         
-stage('Deploy') {
+    stage('Deploy') {
     steps {
         script {
+            // Get the branch name from Jenkins environment variables
             def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
             
             echo "Detected branch: ${branchName}"
@@ -70,12 +71,15 @@ stage('Deploy') {
             def DOCKER_HUB_REPO
             
             // Determine the Docker Hub repo based on the branch
-            if (branchName == 'dev') {
-                DOCKER_HUB_REPO = DOCKER_DEV_REPO
-            } else if (branchName == 'master') {
-                DOCKER_HUB_REPO = DOCKER_PROD_REPO
-            } else {
-                error "Branch ${branchName} is not supported for deployment."
+            switch (branchName) {
+                case 'dev':
+                    DOCKER_HUB_REPO = DOCKER_DEV_REPO
+                    break
+                case 'master':
+                    DOCKER_HUB_REPO = DOCKER_PROD_REPO
+                    break
+                default:
+                    error "Branch ${branchName} is not supported for deployment."
             }
             
             echo "Using Docker Hub repository: ${DOCKER_HUB_REPO}"
@@ -98,6 +102,7 @@ stage('Deploy') {
         }
     }
 }
+    
 
     
     post {
