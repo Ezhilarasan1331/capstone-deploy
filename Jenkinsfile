@@ -57,7 +57,7 @@ pipeline {
             }
         }
         
-        stage('Push to Docker ') {
+        stage('Push to Docker Hub') {
             steps {
                 script {
                     def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
@@ -102,7 +102,7 @@ pipeline {
         }
 		
 		
-       stage('Deploy to AWS EC2') {
+		     stage('Deploy to AWS EC2') {
             steps {
                 script {
                     echo "Deploying to AWS EC2..."
