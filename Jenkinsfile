@@ -9,7 +9,7 @@ pipeline {
         IMAGE_NAME = "capstoneimg"
         IMAGE_TAG = "latest"
         DOCKERFILE_PATH = "." // Path to your Dockerfile, usually the current directory
-        EC2_SSH_CREDENTIALS = 'ec2-ssh-key' // Jenkins credential ID for EC2 SSH key
+		EC2_SSH_CREDENTIALS = 'ec2-ssh-key' // Jenkins credential ID for EC2 SSH key
         EC2_HOST = 'ubuntu@13.127.181.238' // Replace with your EC2 instance's public IP address
     }
 
@@ -57,7 +57,7 @@ pipeline {
             }
         }
         
-        stage('Pushing Image to Docker') {
+        stage('Deploy') {
             steps {
                 script {
                     def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
@@ -100,8 +100,9 @@ pipeline {
                 }
             }
         }
-        
-        stage('Deploy to AWS EC2') {
+		
+		
+		     stage('Deploy to AWS EC2') {
             steps {
                 script {
                     echo "Deploying to AWS EC2..."
@@ -120,11 +121,12 @@ pipeline {
                 }
             }
         }
+		
     }
 
     post {
         always {
-            // Clean up Docker the images after build
+            // Clean up Docker the  images after build
             cleanWs()
         }
     }
