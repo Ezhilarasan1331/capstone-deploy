@@ -25,7 +25,7 @@ else
 fi
 
 echo "Using Docker Hub repository: ${DOCKER_HUB_REPO}"
-# docker
+# Docker login
 # Docker login and push
 docker_login() {
     echo "Executing Docker login..."
