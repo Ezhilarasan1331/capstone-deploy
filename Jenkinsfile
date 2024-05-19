@@ -9,6 +9,8 @@ pipeline {
         IMAGE_NAME = "capstoneimg"
         IMAGE_TAG = "latest"
         DOCKERFILE_PATH = "." // Path to your Dockerfile, usually the current directory
+        EC2_SSH_CREDENTIALS = 'ec2-ssh-key' // Jenkins credential ID for EC2 SSH key
+        EC2_HOST = 'ubuntu@13.127.181.238' // Replace with your EC2 instance's public IP address
     }
 
     stages {
@@ -55,7 +57,7 @@ pipeline {
             }
         }
         
-        stage('Deploy') {
+        stage('Pushing Image to Docker') {
             steps {
                 script {
                     def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
@@ -98,11 +100,31 @@ pipeline {
                 }
             }
         }
+        
+        stage('Deploy to AWS EC2') {
+            steps {
+                script {
+                    echo "Deploying to AWS EC2..."
+                    // SSH to the EC2 instance and pull the Docker image, then run it
+                    sshagent(credentials: [EC2_SSH_CREDENTIALS]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${EC2_HOST} << EOF
+                                docker login -u ${env.DOCKER_HUB_USER} -p ${env.DOCKER_HUB_PASSWORD}
+                                docker pull ${env.DOCKER_HUB_USER}/${env.DOCKER_PROD_REPO}:${env.IMAGE_TAG}
+                                docker stop ${env.IMAGE_NAME} || true
+                                docker rm ${env.IMAGE_NAME} || true
+                                docker run -d --name ${env.IMAGE_NAME} -p 80:80 ${env.DOCKER_HUB_USER}/${env.DOCKER_PROD_REPO}:${env.IMAGE_TAG}
+                            EOF
+                        """
+                    }
+                }
+            }
+        }
     }
 
     post {
         always {
-            // Clean up Docker the  images after build
+            // Clean up Docker the images after build
             cleanWs()
         }
     }
