@@ -55,7 +55,7 @@ pipeline {
             }
         }
         
-    stage('Deploy') {
+stage('Deploy') {
     steps {
         script {
             def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
@@ -98,7 +98,6 @@ pipeline {
         }
     }
 }
-                 
 
     
     post {
