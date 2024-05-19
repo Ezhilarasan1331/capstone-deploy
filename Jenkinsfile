@@ -55,8 +55,13 @@ pipeline {
             }
         }
         
+<<<<<<< HEAD
     stage('Deploy') {
        steps {
+=======
+stage('Deploy') {
+    steps {
+>>>>>>> dev
         script {
             def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
             
