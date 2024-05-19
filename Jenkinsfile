@@ -9,8 +9,8 @@ pipeline {
         IMAGE_NAME = "capstoneimg"
         IMAGE_TAG = "latest"
         DOCKERFILE_PATH = "." // Path to your Dockerfile, usually the current directory
-		EC2_SSH_CREDENTIALS = 'ec2-ssh-key' // Jenkins credential ID for EC2 SSH key
-        EC2_HOST = 'ubuntu@13.127.181.238' // Replace with your EC2 instance's public IP address
+	EC2_SSH_CREDENTIALS = 'ec2-ssh-key' // Jenkins credential ID for EC2 SSH key
+        EC2_HOST = 'ubuntu@35.154.116.78' // Replace with your EC2 instance's public IP address
     }
 
     stages {
