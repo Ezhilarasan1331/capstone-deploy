@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     image: capstoneimg
     ports:
-      - "83:80"
+      - "87:80"
     environment:
       NODE_ENV: production
     restart: unless-stopped
