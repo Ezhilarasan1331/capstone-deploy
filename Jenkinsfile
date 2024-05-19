@@ -102,9 +102,8 @@ pipeline {
 
     post {
         always {
-            // Clean up Docker images after build
+            // Clean up Docker the  images after build
             cleanWs()
         }
     }
 }
-
