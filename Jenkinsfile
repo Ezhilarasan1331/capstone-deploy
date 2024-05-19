@@ -58,18 +58,17 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    def DOCKER_HUB_REPO
-                    def branchName = env.GIT_BRANCH ?: env.BRANCH_NAME ?: 'unknown'
+                    def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
                     
                     echo "Detected branch: ${branchName}"
                     
                     // Remove 'origin/' prefix if present
-                    if (branchName.startsWith('origin/')) {
-                        branchName = branchName.replace('origin/', '')
-                    }
-
+                    branchName = branchName.replaceAll('^origin/', '')
+                    
                     echo "Branch after removing prefix: ${branchName}"
-
+                    
+                    def DOCKER_HUB_REPO
+                    
                     // Determine the Docker Hub repo based on the branch
                     if (branchName == 'dev') {
                         DOCKER_HUB_REPO = DOCKER_DEV_REPO
