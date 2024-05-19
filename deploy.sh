@@ -45,4 +45,7 @@ tag_and_push_image() {
 # Main script execution
 docker_login
 tag_and_push_image
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/dev
