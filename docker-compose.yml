@@ -10,3 +10,6 @@ services:
       - "83:80"
     environment:
       NODE_ENV: production
+    restart: unless-stopped
+    volumes:
+      - ./path/on/host:/path/in/container
