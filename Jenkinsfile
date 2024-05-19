@@ -57,7 +57,7 @@ pipeline {
             }
         }
         
-        stage('Deploy') {
+        stage('Push to Cocker Hub') {
             steps {
                 script {
                     def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
