@@ -11,7 +11,5 @@ services:
     environment:
       NODE_ENV: production
     restart: unless-stopped
-    networks:
-      - frontend
-    volumes:
+       volumes:
       - ./path/on/host:/path/in/container
